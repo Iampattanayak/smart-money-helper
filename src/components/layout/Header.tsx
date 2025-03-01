@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calculator, LineChart, BadgePercent } from 'lucide-react';
+import { Calculator, LineChart, BadgePercent, Landmark, Coins, Wallet } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface HeaderProps {
@@ -13,6 +13,9 @@ const Header: React.FC<HeaderProps> = ({ activeCalculator, onChangeCalculator })
     { id: 'emi', label: 'EMI Calculator', icon: <Calculator className="w-4 h-4" /> },
     { id: 'sip', label: 'SIP Calculator', icon: <LineChart className="w-4 h-4" /> },
     { id: 'gst', label: 'GST Calculator', icon: <BadgePercent className="w-4 h-4" /> },
+    { id: 'fd', label: 'FD Calculator', icon: <Landmark className="w-4 h-4" /> },
+    { id: 'rd', label: 'RD Calculator', icon: <Coins className="w-4 h-4" /> },
+    { id: 'ppf', label: 'PPF Calculator', icon: <Wallet className="w-4 h-4" /> },
   ];
 
   return (
@@ -25,7 +28,7 @@ const Header: React.FC<HeaderProps> = ({ activeCalculator, onChangeCalculator })
           </div>
           
           <nav>
-            <ul className="flex items-center space-x-1 p-1 bg-muted/50 rounded-lg">
+            <ul className="flex items-center space-x-1 p-1 bg-muted/50 rounded-lg overflow-x-auto hide-scrollbar">
               {menuItems.map((item) => (
                 <li key={item.id}>
                   <button

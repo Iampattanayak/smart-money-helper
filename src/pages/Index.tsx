@@ -5,6 +5,9 @@ import CalculatorLayout from '@/components/layout/CalculatorLayout';
 import EMICalculator from '@/components/calculators/EMICalculator';
 import SIPCalculator from '@/components/calculators/SIPCalculator';
 import GSTCalculator from '@/components/calculators/GSTCalculator';
+import FDCalculator from '@/components/calculators/FDCalculator';
+import RDCalculator from '@/components/calculators/RDCalculator';
+import PPFCalculator from '@/components/calculators/PPFCalculator';
 
 const Index: React.FC = () => {
   const [activeCalculator, setActiveCalculator] = useState('emi');
@@ -17,6 +20,12 @@ const Index: React.FC = () => {
         return <SIPCalculator />;
       case 'gst':
         return <GSTCalculator />;
+      case 'fd':
+        return <FDCalculator />;
+      case 'rd':
+        return <RDCalculator />;
+      case 'ppf':
+        return <PPFCalculator />;
       default:
         return <EMICalculator />;
     }

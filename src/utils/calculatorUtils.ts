@@ -252,3 +252,183 @@ export const generateSIPChartData = (
     wealthGained: yearlyData.map(item => item.wealthGained)
   };
 };
+
+// Calculate Fixed Deposit maturity amount
+export const calculateFD = (
+  principal: number,
+  interestRate: number,
+  timePeriodYears: number,
+  interestFrequency: 'monthly' | 'quarterly' | 'cumulative' = 'cumulative'
+): number => {
+  // Handle edge cases
+  if (principal <= 0 || interestRate <= 0 || timePeriodYears <= 0) return 0;
+  
+  const r = interestRate / 100; // Convert percentage to decimal
+  
+  // Calculate based on interest frequency
+  switch (interestFrequency) {
+    case 'monthly':
+      // For monthly interest payout, simple interest for each month
+      return principal + (principal * r * timePeriodYears);
+    
+    case 'quarterly':
+      // For quarterly compounding
+      const quarterlyRate = r / 4;
+      const quarters = timePeriodYears * 4;
+      return principal * Math.pow(1 + quarterlyRate, quarters);
+    
+    case 'cumulative':
+    default:
+      // For annual compounding (default)
+      return principal * Math.pow(1 + r, timePeriodYears);
+  }
+};
+
+// Calculate Recurring Deposit maturity amount
+export const calculateRD = (
+  monthlyDeposit: number,
+  interestRate: number,
+  timePeriodMonths: number
+): number => {
+  // Handle edge cases
+  if (monthlyDeposit <= 0 || interestRate <= 0 || timePeriodMonths <= 0) return 0;
+  
+  const r = interestRate / 100 / 4; // Quarterly rate in decimal
+  const n = timePeriodMonths;
+  
+  // Formula for RD: P * (1 + r)^n
+  // where P is monthly deposit, r is rate per quarter, n is number of months
+  
+  // Calculate the maturity amount using the formula:
+  // M = R × {(1 + r)^n - 1} / r
+  const maturityAmount = monthlyDeposit * ((Math.pow(1 + r, n) - 1) / r);
+  
+  return maturityAmount;
+};
+
+// Calculate PPF (Public Provident Fund) maturity amount
+export const calculatePPF = (
+  yearlyDeposit: number,
+  interestRate: number,
+  durationYears: number
+): number => {
+  // Handle edge cases
+  if (yearlyDeposit <= 0 || interestRate <= 0 || durationYears <= 0) return 0;
+  
+  const r = interestRate / 100; // Convert interest rate to decimal
+  let balance = 0;
+  
+  // PPF calculation is done year by year with compound interest
+  for (let year = 1; year <= durationYears; year++) {
+    // Add this year's deposit
+    balance += yearlyDeposit;
+    
+    // Add interest for the year
+    balance += balance * r;
+  }
+  
+  return balance;
+};
+
+// Generate chart data for FD visualization
+export const generateFDChartData = (
+  principal: number,
+  interestRate: number,
+  timePeriodYears: number,
+  interestFrequency: 'monthly' | 'quarterly' | 'cumulative' = 'cumulative'
+): {
+  labels: string[];
+  principal: number[];
+  interest: number[];
+} => {
+  const labels = [];
+  const principalData = [];
+  const interestData = [];
+  
+  for (let year = 1; year <= timePeriodYears; year++) {
+    const maturityAmount = calculateFD(principal, interestRate, year, interestFrequency);
+    const interestEarned = maturityAmount - principal;
+    
+    labels.push(`Year ${year}`);
+    principalData.push(principal);
+    interestData.push(interestEarned);
+  }
+  
+  return {
+    labels,
+    principal: principalData,
+    interest: interestData
+  };
+};
+
+// Generate chart data for RD visualization
+export const generateRDChartData = (
+  monthlyDeposit: number,
+  interestRate: number,
+  timePeriodMonths: number
+): {
+  labels: string[];
+  deposits: number[];
+  interest: number[];
+} => {
+  const labels = [];
+  const depositsData = [];
+  const interestData = [];
+  
+  // Take quarters as data points to keep chart clean
+  const interval = Math.max(3, Math.floor(timePeriodMonths / 12));
+  
+  for (let month = interval; month <= timePeriodMonths; month += interval) {
+    const maturityAmount = calculateRD(monthlyDeposit, interestRate, month);
+    const totalDeposited = monthlyDeposit * month;
+    const interestEarned = maturityAmount - totalDeposited;
+    
+    labels.push(`Month ${month}`);
+    depositsData.push(totalDeposited);
+    interestData.push(interestEarned);
+  }
+  
+  return {
+    labels,
+    deposits: depositsData,
+    interest: interestData
+  };
+};
+
+// Generate chart data for PPF visualization
+export const generatePPFChartData = (
+  yearlyDeposit: number,
+  interestRate: number,
+  durationYears: number
+): {
+  labels: string[];
+  deposits: number[];
+  interest: number[];
+} => {
+  const labels = [];
+  const depositsData = [];
+  const interestData = [];
+  
+  let balance = 0;
+  let totalDeposited = 0;
+  
+  for (let year = 1; year <= durationYears; year++) {
+    // Add this year's deposit
+    totalDeposited += yearlyDeposit;
+    balance += yearlyDeposit;
+    
+    // Add interest for the year
+    const interestForYear = balance * (interestRate / 100);
+    balance += interestForYear;
+    
+    labels.push(`Year ${year}`);
+    depositsData.push(totalDeposited);
+    interestData.push(balance - totalDeposited);
+  }
+  
+  return {
+    labels,
+    deposits: depositsData,
+    interest: interestData
+  };
+};
