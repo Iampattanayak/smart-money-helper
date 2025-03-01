@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calculator, ChartLineUp, BadgePercent } from 'lucide-react';
+import { Calculator, LineChart, BadgePercent } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface HeaderProps {
@@ -11,7 +11,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ activeCalculator, onChangeCalculator }) => {
   const menuItems = [
     { id: 'emi', label: 'EMI Calculator', icon: <Calculator className="w-4 h-4" /> },
-    { id: 'sip', label: 'SIP Calculator', icon: <ChartLineUp className="w-4 h-4" /> },
+    { id: 'sip', label: 'SIP Calculator', icon: <LineChart className="w-4 h-4" /> },
     { id: 'gst', label: 'GST Calculator', icon: <BadgePercent className="w-4 h-4" /> },
   ];
 
