@@ -1,13 +1,39 @@
-// Update this page (the content is just a fallback if you fail to update the page)
 
-const Index = () => {
+import React, { useState } from 'react';
+import Header from '@/components/layout/Header';
+import CalculatorLayout from '@/components/layout/CalculatorLayout';
+import EMICalculator from '@/components/calculators/EMICalculator';
+import SIPCalculator from '@/components/calculators/SIPCalculator';
+import GSTCalculator from '@/components/calculators/GSTCalculator';
+
+const Index: React.FC = () => {
+  const [activeCalculator, setActiveCalculator] = useState('emi');
+
+  const renderCalculator = () => {
+    switch (activeCalculator) {
+      case 'emi':
+        return <EMICalculator />;
+      case 'sip':
+        return <SIPCalculator />;
+      case 'gst':
+        return <GSTCalculator />;
+      default:
+        return <EMICalculator />;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <>
+      <Header 
+        activeCalculator={activeCalculator} 
+        onChangeCalculator={setActiveCalculator} 
+      />
+      <CalculatorLayout>
+        <div className="animate-fade-in">
+          {renderCalculator()}
+        </div>
+      </CalculatorLayout>
+    </>
   );
 };
 
