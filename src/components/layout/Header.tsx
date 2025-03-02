@@ -16,7 +16,7 @@ const Header: React.FC<HeaderProps> = ({ activeCalculator, onChangeCalculator })
     { id: 'fd', label: 'FD Calculator', icon: <Landmark className="w-4 h-4" /> },
     { id: 'rd', label: 'RD Calculator', icon: <Coins className="w-4 h-4" /> },
     { id: 'ppf', label: 'PPF Calculator', icon: <Wallet className="w-4 h-4" /> },
-    { id: 'credit-score', label: 'Credit Score', icon: <CreditCard className="w-4 h-4" /> },
+    { id: 'credit-score', label: 'Credit Impact', icon: <CreditCard className="w-4 h-4" /> },
   ];
 
   return (
