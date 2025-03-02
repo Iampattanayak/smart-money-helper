@@ -8,6 +8,7 @@ import GSTCalculator from '@/components/calculators/GSTCalculator';
 import FDCalculator from '@/components/calculators/FDCalculator';
 import RDCalculator from '@/components/calculators/RDCalculator';
 import PPFCalculator from '@/components/calculators/PPFCalculator';
+import CreditScoreCalculator from '@/components/calculators/CreditScoreCalculator';
 
 const Index: React.FC = () => {
   const [activeCalculator, setActiveCalculator] = useState('emi');
@@ -26,6 +27,8 @@ const Index: React.FC = () => {
         return <RDCalculator />;
       case 'ppf':
         return <PPFCalculator />;
+      case 'credit-score':
+        return <CreditScoreCalculator />;
       default:
         return <EMICalculator />;
     }
