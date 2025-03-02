@@ -9,6 +9,7 @@ interface ResultDisplayProps {
   className?: string;
   subtitle?: string;
   icon?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const ResultDisplay: React.FC<ResultDisplayProps> = ({
@@ -18,14 +19,16 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
   className,
   subtitle,
   icon,
+  children,
 }) => {
   return (
     <div className={cn(
       "flex flex-col p-4 rounded-lg transition-all duration-300",
-      "animate-fade-in border border-border/60",
+      "animate-fade-in border border-border/60 relative",
       highlightColor,
       className
     )}>
+      {children}
       <div className="flex items-center mb-1">
         {icon && <span className="mr-2">{icon}</span>}
         <p className="text-sm font-medium text-foreground/70">{label}</p>

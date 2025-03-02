@@ -96,7 +96,7 @@ const LoanComparisonCalculator: React.FC = () => {
     const data: any[] = [];
     
     for (let month = 0; month <= maxMonths; month += 6) { // Plot every 6 months for clarity
-      const dataPoint: any = { month: month === 0 ? 'Start' : `${month} mo` };
+      const dataPoint: any = { name: month === 0 ? 'Start' : `${month} mo` };
       
       loansData.forEach(loan => {
         if (month <= loan.tenure * 12) {
@@ -245,13 +245,17 @@ const LoanComparisonCalculator: React.FC = () => {
             </div>
             
             <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto pr-1">
-              {loans.map((loan, index) => (
+              {loans.map((loan) => (
                 <CalculatorCard 
                   key={loan.id} 
                   title={loan.name}
                   className="border-l-4"
-                  style={{ borderLeftColor: loan.color }}
+                  highlight={false}
                 >
+                  <div 
+                    className="absolute left-0 top-0 bottom-0 w-1" 
+                    style={{ backgroundColor: loan.color }}
+                  />
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <input
@@ -337,18 +341,22 @@ const LoanComparisonCalculator: React.FC = () => {
                   key={loan.id}
                   label={loan.name}
                   value={`₹${formatCurrency(loan.emi)}/month`}
-                  highlightColor={`bg-opacity-10`}
-                  className="border-l-4"
-                  style={{ borderLeftColor: loan.color, backgroundColor: `${loan.color}15` }}
+                  highlightColor={`bg-${loan.color.replace('#', '')}/10`}
+                  className={`relative border-l-4 transition-all duration-300`}
                   subtitle={`Total: ₹${formatCurrency(loan.totalAmount)}`}
-                />
+                >
+                  <div 
+                    className="absolute left-0 top-0 h-full w-1 rounded-l-lg" 
+                    style={{ backgroundColor: loan.color }}
+                  />
+                </ResultDisplay>
               ))}
             </div>
             
             {/* Comparison Chart */}
             {comparisonData.length > 0 && (
               <LineChart
-                title="Loan Comparison"
+                title="Loan Cost Comparison"
                 data={comparisonData}
                 series={loans.map(loan => ({
                   name: loan.name,
@@ -371,7 +379,7 @@ const LoanComparisonCalculator: React.FC = () => {
                   dataKey: loan.name,
                   color: loan.color
                 }))}
-                type="line"
+                type="area"
                 yAxisFormatter={(value) => `₹${Math.round(value / 100000)}L`}
                 tooltipFormatter={(value) => `₹${value.toLocaleString('en-IN')}`}
               />

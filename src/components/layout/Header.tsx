@@ -11,13 +11,13 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ activeCalculator, onChangeCalculator }) => {
   const menuItems = [
     { id: 'emi', label: 'EMI Calculator', icon: <Calculator className="w-4 h-4" /> },
+    { id: 'loan-comparison', label: 'Loan Comparison', icon: <BarChart2 className="w-4 h-4" /> },
     { id: 'sip', label: 'SIP Calculator', icon: <LineChart className="w-4 h-4" /> },
     { id: 'gst', label: 'GST Calculator', icon: <BadgePercent className="w-4 h-4" /> },
     { id: 'fd', label: 'FD Calculator', icon: <Landmark className="w-4 h-4" /> },
     { id: 'rd', label: 'RD Calculator', icon: <Coins className="w-4 h-4" /> },
     { id: 'ppf', label: 'PPF Calculator', icon: <Wallet className="w-4 h-4" /> },
     { id: 'credit-score', label: 'Credit Impact', icon: <CreditCard className="w-4 h-4" /> },
-    { id: 'loan-comparison', label: 'Loan Comparison', icon: <BarChart2 className="w-4 h-4" /> },
   ];
 
   return (
