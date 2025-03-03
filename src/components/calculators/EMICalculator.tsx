@@ -1,11 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { RotateCcw } from 'lucide-react';
 import CalculatorInput from '../ui-elements/CalculatorInput';
 import CalculatorCard from '../ui-elements/CalculatorCard';
-import CalculatorTabs, { Tab } from '../ui-elements/CalculatorTabs';
 import ResultDisplay from '../ui-elements/ResultDisplay';
 import LineChart from '../charts/LineChart';
 import {
@@ -315,8 +313,8 @@ const EMICalculator: React.FC = () => {
     </div>
   );
   
-  // Define tabs configuration
-  const tabs: Tab[] = [
+  // Define the 2x2 grid layout for calculator tabs
+  const calculatorOptions = [
     { id: 'emi', label: 'EMI', content: EMICalculatorContent },
     { id: 'loan', label: 'Loan Amount', content: LoanAmountCalculatorContent },
     { id: 'interest', label: 'Interest Rate', content: InterestRateCalculatorContent },
@@ -357,11 +355,27 @@ const EMICalculator: React.FC = () => {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-1 space-y-6">
         <CalculatorCard title="EMI Calculator" description="Calculate loan EMI, amount, interest or tenure">
-          <CalculatorTabs 
-            tabs={tabs} 
-            defaultTab={activeTab}
-            onChange={setActiveTab}
-          />
+          {/* 2x2 Grid Layout for Calculator Options */}
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            {calculatorOptions.map(option => (
+              <div
+                key={option.id}
+                onClick={() => setActiveTab(option.id)}
+                className={`p-3 rounded-lg cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center ${
+                  activeTab === option.id 
+                    ? 'bg-primary/10 text-primary border border-primary/30' 
+                    : 'bg-muted hover:bg-muted/80 border border-transparent'
+                }`}
+              >
+                <span className={`text-sm font-medium ${activeTab === option.id ? 'text-primary' : 'text-foreground/80'}`}>
+                  {option.label}
+                </span>
+              </div>
+            ))}
+          </div>
+          
+          {/* Display the content for the active tab */}
+          {calculatorOptions.find(option => option.id === activeTab)?.content}
         </CalculatorCard>
       </div>
       
