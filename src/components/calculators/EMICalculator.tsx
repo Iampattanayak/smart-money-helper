@@ -14,9 +14,7 @@ import {
   calculateTimePeriod,
   formatCurrency,
   generateEMIChartData,
-  calculateAmortizationSchedule
 } from '@/utils/calculatorUtils';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 
 const EMICalculator: React.FC = () => {
   // Common state for all calculators
@@ -30,10 +28,6 @@ const EMICalculator: React.FC = () => {
   const [totalInterest, setTotalInterest] = useState(0);
   const [totalPayment, setTotalPayment] = useState(0);
   const [chartData, setChartData] = useState<any[]>([]);
-  
-  // Payment schedule state
-  const [paymentSchedule, setPaymentSchedule] = useState<any[]>([]);
-  const [showFullSchedule, setShowFullSchedule] = useState(false);
   
   // Calculate results based on the active tab
   useEffect(() => {
@@ -61,10 +55,6 @@ const EMICalculator: React.FC = () => {
             'Interest Paid': chartData.interest[index],
           }))
         );
-        
-        // Generate payment schedule
-        const schedule = calculateAmortizationSchedule(loanAmount, interestRate, loanTenure);
-        setPaymentSchedule(schedule);
         break;
         
       case 'loan':
@@ -361,58 +351,6 @@ const EMICalculator: React.FC = () => {
         return 'Loan Tenure';
     }
   };
-
-  // Payment Schedule display
-  const PaymentScheduleTable = () => {
-    // Display limited entries initially
-    const displaySchedule = showFullSchedule 
-      ? paymentSchedule 
-      : paymentSchedule.slice(0, 12); // Show first year by default
-      
-    return (
-      <CalculatorCard 
-        title="Payment Schedule" 
-        description="Monthly breakdown of your loan repayment"
-        className="mt-6"
-      >
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[80px] text-center">Month</TableHead>
-                <TableHead className="text-right">EMI</TableHead>
-                <TableHead className="text-right">Principal</TableHead>
-                <TableHead className="text-right">Interest</TableHead>
-                <TableHead className="text-right">Balance</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {displaySchedule.map((entry) => (
-                <TableRow key={entry.month}>
-                  <TableCell className="text-center font-medium">{entry.month}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(entry.emi)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(entry.principal)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(entry.interest)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(entry.balance)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-        {paymentSchedule.length > 12 && (
-          <div className="flex justify-center mt-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowFullSchedule(!showFullSchedule)}
-            >
-              {showFullSchedule ? "Show Less" : "Show Full Schedule"}
-            </Button>
-          </div>
-        )}
-      </CalculatorCard>
-    );
-  };
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -477,9 +415,6 @@ const EMICalculator: React.FC = () => {
             tooltipFormatter={(value) => `₹${value.toLocaleString('en-IN')}`}
           />
         )}
-        
-        {/* Display payment schedule only for EMI calculator */}
-        {activeTab === 'emi' && paymentSchedule.length > 0 && <PaymentScheduleTable />}
       </div>
     </div>
   );
