@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -14,7 +13,9 @@ import {
   calculateTimePeriod,
   formatCurrency,
   generateEMIChartData,
+  calculateAmortizationSchedule,
 } from '@/utils/calculatorUtils';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const EMICalculator: React.FC = () => {
   // Common state for all calculators
@@ -28,6 +29,16 @@ const EMICalculator: React.FC = () => {
   const [totalInterest, setTotalInterest] = useState(0);
   const [totalPayment, setTotalPayment] = useState(0);
   const [chartData, setChartData] = useState<any[]>([]);
+  
+  // Payment schedule state
+  const [showPaymentSchedule, setShowPaymentSchedule] = useState(false);
+  const [paymentSchedule, setPaymentSchedule] = useState<Array<{
+    month: number;
+    emi: number;
+    principal: number;
+    interest: number;
+    balance: number;
+  }>>([]);
   
   // Calculate results based on the active tab
   useEffect(() => {
@@ -55,6 +66,10 @@ const EMICalculator: React.FC = () => {
             'Interest Paid': chartData.interest[index],
           }))
         );
+        
+        // Generate payment schedule
+        const schedule = calculateAmortizationSchedule(loanAmount, interestRate, loanTenure);
+        setPaymentSchedule(schedule);
         break;
         
       case 'loan':
@@ -88,6 +103,7 @@ const EMICalculator: React.FC = () => {
     setInterestRate(8.5);
     setLoanTenure(5);
     setEmiAmount(20000);
+    setShowPaymentSchedule(false);
   };
   
   // Content for EMI Calculator Tab
@@ -352,6 +368,56 @@ const EMICalculator: React.FC = () => {
     }
   };
   
+  // Payment Schedule Table Component
+  const PaymentSchedule = () => {
+    // Show only first 12 months and then every 12th month, plus the last month
+    const displayedSchedule = paymentSchedule.filter((item, index) => 
+      index < 12 || index === paymentSchedule.length - 1 || index % 12 === 0
+    );
+    
+    return (
+      <div className="mt-6 animate-fade-in">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium">Payment Schedule</h3>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setShowPaymentSchedule(false)}
+          >
+            Hide Schedule
+          </Button>
+        </div>
+        <div className="border rounded-md overflow-auto max-h-[500px]">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Payment No.</TableHead>
+                <TableHead>EMI Amount</TableHead>
+                <TableHead>Principal</TableHead>
+                <TableHead>Interest</TableHead>
+                <TableHead>Balance</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {displayedSchedule.map((payment) => (
+                <TableRow key={payment.month}>
+                  <TableCell>{payment.month}</TableCell>
+                  <TableCell>{formatCurrency(payment.emi)}</TableCell>
+                  <TableCell>{formatCurrency(payment.principal)}</TableCell>
+                  <TableCell>{formatCurrency(payment.interest)}</TableCell>
+                  <TableCell>{formatCurrency(payment.balance)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        <p className="text-sm text-muted-foreground mt-2">
+          Showing first year monthly payments, then yearly, and final payment.
+        </p>
+      </div>
+    );
+  };
+  
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-1 space-y-6">
@@ -402,18 +468,35 @@ const EMICalculator: React.FC = () => {
           />
         </div>
         
-        {activeTab === 'emi' && chartData.length > 0 && (
-          <LineChart
-            title="Loan Amortization"
-            data={chartData}
-            series={[
-              { name: 'Principal Paid', dataKey: 'Principal Paid', color: '#1E90FF' },
-              { name: 'Interest Paid', dataKey: 'Interest Paid', color: '#FF6347' }
-            ]}
-            type="area"
-            yAxisFormatter={(value) => `₹${Math.round(value / 1000)}K`}
-            tooltipFormatter={(value) => `₹${value.toLocaleString('en-IN')}`}
-          />
+        {activeTab === 'emi' && (
+          <>
+            {chartData.length > 0 && (
+              <LineChart
+                title="Loan Amortization"
+                data={chartData}
+                series={[
+                  { name: 'Principal Paid', dataKey: 'Principal Paid', color: '#1E90FF' },
+                  { name: 'Interest Paid', dataKey: 'Interest Paid', color: '#FF6347' }
+                ]}
+                type="area"
+                yAxisFormatter={(value) => `₹${Math.round(value / 1000)}K`}
+                tooltipFormatter={(value) => `₹${value.toLocaleString('en-IN')}`}
+              />
+            )}
+            
+            {!showPaymentSchedule && (
+              <div className="text-center mt-4">
+                <Button 
+                  variant="outline"
+                  onClick={() => setShowPaymentSchedule(true)}
+                >
+                  View Payment Schedule
+                </Button>
+              </div>
+            )}
+            
+            {showPaymentSchedule && <PaymentSchedule />}
+          </>
         )}
       </div>
     </div>
