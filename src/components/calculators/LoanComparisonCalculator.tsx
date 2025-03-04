@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2, RotateCcw, Info } from 'lucide-react';
@@ -16,6 +15,7 @@ interface LoanData {
   principal: number;
   interestRate: number;
   tenure: number;
+  timeUnit: 'years' | 'months';
   emi: number;
   totalInterest: number;
   totalAmount: number;
@@ -44,6 +44,7 @@ const LoanComparisonCalculator: React.FC = () => {
       principal: 500000,
       interestRate: 8.5,
       tenure: 20,
+      timeUnit: 'years',
       emi: 0,
       totalInterest: 0,
       totalAmount: 0,
@@ -55,6 +56,7 @@ const LoanComparisonCalculator: React.FC = () => {
       principal: 500000,
       interestRate: 10,
       tenure: 15,
+      timeUnit: 'years',
       emi: 0,
       totalInterest: 0,
       totalAmount: 0,
@@ -68,8 +70,11 @@ const LoanComparisonCalculator: React.FC = () => {
   useEffect(() => {
     // Calculate loan metrics for each loan
     const updatedLoans = loans.map(loan => {
-      const emi = calculateEMI(loan.principal, loan.interestRate, loan.tenure);
-      const totalAmount = emi * loan.tenure * 12;
+      // Convert tenure to years for calculation if needed
+      const tenureInYears = loan.timeUnit === 'years' ? loan.tenure : loan.tenure / 12;
+      
+      const emi = calculateEMI(loan.principal, loan.interestRate, tenureInYears);
+      const totalAmount = emi * tenureInYears * 12;
       const totalInterest = totalAmount - loan.principal;
       
       return {
@@ -87,22 +92,28 @@ const LoanComparisonCalculator: React.FC = () => {
     
     // Generate comparison chart data
     generateComparisonData(updatedLoans);
-  }, [loans.map(loan => `${loan.principal}-${loan.interestRate}-${loan.tenure}`)]);
+  }, [loans.map(loan => `${loan.principal}-${loan.interestRate}-${loan.tenure}-${loan.timeUnit}`)]);
 
   const generateChartData = (loansData: LoanData[]) => {
     if (loansData.length === 0) return;
     
-    const maxMonths = Math.max(...loansData.map(loan => loan.tenure * 12));
+    const maxMonths = Math.max(...loansData.map(loan => {
+      const tenureMonths = loan.timeUnit === 'years' ? loan.tenure * 12 : loan.tenure;
+      return tenureMonths;
+    }));
+    
     const data: any[] = [];
     
     for (let month = 0; month <= maxMonths; month += 6) { // Plot every 6 months for clarity
       const dataPoint: any = { name: month === 0 ? 'Start' : `${month} mo` };
       
       loansData.forEach(loan => {
-        if (month <= loan.tenure * 12) {
+        const loanTenureMonths = loan.timeUnit === 'years' ? loan.tenure * 12 : loan.tenure;
+        
+        if (month <= loanTenureMonths) {
           const monthlyRate = loan.interestRate / 12 / 100;
           const emi = loan.emi;
-          const remainingMonths = loan.tenure * 12 - month;
+          const remainingMonths = loanTenureMonths - month;
           const outstandingPrincipal = month === 0 
             ? loan.principal 
             : (emi / monthlyRate) * (1 - 1 / Math.pow(1 + monthlyRate, remainingMonths));
@@ -151,6 +162,7 @@ const LoanComparisonCalculator: React.FC = () => {
       principal: 500000,
       interestRate: 9,
       tenure: 10,
+      timeUnit: 'years',
       emi: 0,
       totalInterest: 0,
       totalAmount: 0,
@@ -173,6 +185,7 @@ const LoanComparisonCalculator: React.FC = () => {
         principal: 500000,
         interestRate: 8.5,
         tenure: 20,
+        timeUnit: 'years',
         emi: 0,
         totalInterest: 0,
         totalAmount: 0,
@@ -184,6 +197,7 @@ const LoanComparisonCalculator: React.FC = () => {
         principal: 500000,
         interestRate: 10,
         tenure: 15,
+        timeUnit: 'years',
         emi: 0,
         totalInterest: 0,
         totalAmount: 0,
@@ -199,6 +213,19 @@ const LoanComparisonCalculator: React.FC = () => {
           return { ...loan, [field]: value };
         } else if (field !== 'name' && typeof value === 'number') {
           return { ...loan, [field]: value };
+        } else if (field === 'timeUnit' && (value === 'years' || value === 'months')) {
+          // Handle timeUnit change
+          let newTenure = loan.tenure;
+          
+          if (value === 'years' && loan.timeUnit === 'months') {
+            // Convert months to years (round to nearest 0.5)
+            newTenure = Math.round(loan.tenure / 12 * 2) / 2;
+          } else if (value === 'months' && loan.timeUnit === 'years') {
+            // Convert years to months
+            newTenure = Math.round(loan.tenure * 12);
+          }
+          
+          return { ...loan, timeUnit: value, tenure: newTenure };
         }
       }
       return loan;
@@ -306,11 +333,16 @@ const LoanComparisonCalculator: React.FC = () => {
                       label="Loan Tenure"
                       value={loan.tenure}
                       onChange={(value) => handleLoanChange(loan.id, 'tenure', value)}
-                      min={1}
-                      max={30}
-                      step={1}
-                      suffix=" Years"
+                      min={loan.timeUnit === 'years' ? 1 : 1}
+                      max={loan.timeUnit === 'years' ? 30 : 360}
+                      step={loan.timeUnit === 'years' ? 1 : 1}
+                      suffix={loan.timeUnit === 'years' ? " Years" : " Months"}
                       showSlider={true}
+                      timeUnitOptions={{
+                        enabled: true,
+                        currentUnit: loan.timeUnit,
+                        onUnitChange: (unit) => handleLoanChange(loan.id, 'timeUnit', unit)
+                      }}
                     />
                     
                     <div className="pt-2 space-y-2">

@@ -19,6 +19,11 @@ interface CalculatorInputProps {
   inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
   placeholder?: string;
   description?: string;
+  timeUnitOptions?: {
+    enabled: boolean;
+    currentUnit: 'years' | 'months';
+    onUnitChange: (unit: 'years' | 'months') => void;
+  };
 }
 
 const CalculatorInput: React.FC<CalculatorInputProps> = ({
@@ -36,6 +41,7 @@ const CalculatorInput: React.FC<CalculatorInputProps> = ({
   inputMode = 'numeric',
   placeholder,
   description,
+  timeUnitOptions,
 }) => {
   const [inputValue, setInputValue] = useState(value.toString());
   const [isFocused, setIsFocused] = useState(false);
@@ -78,6 +84,13 @@ const CalculatorInput: React.FC<CalculatorInputProps> = ({
     }
   };
 
+  // Calculate the displayed suffix based on time unit options if present
+  const displayedSuffix = suffix && timeUnitOptions?.enabled 
+    ? timeUnitOptions.currentUnit === 'years' 
+      ? suffix.replace('Months', 'Years').replace('months', 'years')
+      : suffix.replace('Years', 'Months').replace('years', 'months')
+    : suffix;
+
   return (
     <div className={cn("mb-4", className)}>
       <div className="flex justify-between items-baseline mb-2">
@@ -87,7 +100,27 @@ const CalculatorInput: React.FC<CalculatorInputProps> = ({
         >
           {label}
         </label>
-        {description && <span className="text-xs text-muted-foreground">{description}</span>}
+        
+        {timeUnitOptions?.enabled && (
+          <div className="flex items-center space-x-2">
+            <button
+              type="button"
+              onClick={() => timeUnitOptions.onUnitChange('years')}
+              className={`text-xs px-2 py-1 rounded ${timeUnitOptions.currentUnit === 'years' ? 'bg-blue-500 text-white' : 'text-gray-500'}`}
+            >
+              Years
+            </button>
+            <button
+              type="button"
+              onClick={() => timeUnitOptions.onUnitChange('months')}
+              className={`text-xs px-2 py-1 rounded ${timeUnitOptions.currentUnit === 'months' ? 'bg-blue-500 text-white' : 'text-gray-500'}`}
+            >
+              Months
+            </button>
+          </div>
+        )}
+        
+        {description && !timeUnitOptions?.enabled && <span className="text-xs text-muted-foreground">{description}</span>}
       </div>
       
       <div className={cn(
@@ -118,9 +151,9 @@ const CalculatorInput: React.FC<CalculatorInputProps> = ({
           placeholder={placeholder}
         />
         
-        {suffix && (
+        {displayedSuffix && (
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <span className="text-foreground/70 sm:text-sm">{suffix}</span>
+            <span className="text-foreground/70 sm:text-sm">{displayedSuffix}</span>
           </div>
         )}
       </div>
@@ -137,8 +170,8 @@ const CalculatorInput: React.FC<CalculatorInputProps> = ({
             className="my-2"
           />
           <div className="flex justify-between">
-            <span className="text-xs text-muted-foreground">{min}{suffix}</span>
-            <span className="text-xs text-muted-foreground">{max}{suffix}</span>
+            <span className="text-xs text-muted-foreground">{min}{displayedSuffix}</span>
+            <span className="text-xs text-muted-foreground">{max}{displayedSuffix}</span>
           </div>
         </div>
       )}

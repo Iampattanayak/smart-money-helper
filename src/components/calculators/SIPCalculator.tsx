@@ -17,6 +17,7 @@ const SIPCalculator: React.FC = () => {
   const [monthlyInvestment, setMonthlyInvestment] = useState(10000);
   const [expectedReturn, setExpectedReturn] = useState(12);
   const [timePeriod, setTimePeriod] = useState(10);
+  const [timeUnit, setTimeUnit] = useState<'years' | 'months'>('years');
   
   const [maturityValue, setMaturityValue] = useState(0);
   const [totalInvestment, setTotalInvestment] = useState(0);
@@ -26,15 +27,18 @@ const SIPCalculator: React.FC = () => {
   // Calculate SIP results
   useEffect(() => {
     const calculateResults = () => {
-      const sipValue = calculateSIP(monthlyInvestment, expectedReturn, timePeriod);
-      const totalInvested = monthlyInvestment * timePeriod * 12;
+      // Convert time period to years for calculation if needed
+      const timePeriodYears = timeUnit === 'years' ? timePeriod : timePeriod / 12;
+      
+      const sipValue = calculateSIP(monthlyInvestment, expectedReturn, timePeriodYears);
+      const totalInvested = monthlyInvestment * timePeriodYears * 12;
       
       setMaturityValue(sipValue);
       setTotalInvestment(totalInvested);
       setWealthGained(sipValue - totalInvested);
       
       // Generate chart data
-      const chartData = generateSIPChartData(monthlyInvestment, expectedReturn, timePeriod);
+      const chartData = generateSIPChartData(monthlyInvestment, expectedReturn, timePeriodYears);
       setChartData(
         chartData.labels.map((label, index) => ({
           name: label,
@@ -45,12 +49,13 @@ const SIPCalculator: React.FC = () => {
     };
     
     calculateResults();
-  }, [monthlyInvestment, expectedReturn, timePeriod]);
+  }, [monthlyInvestment, expectedReturn, timePeriod, timeUnit]);
   
   const handleReset = () => {
     setMonthlyInvestment(10000);
     setExpectedReturn(12);
-    setTimePeriod(10);
+    setTimePeriod(timeUnit === 'years' ? 10 : 120);
+    setTimeUnit('years');
   };
   
   return (
@@ -89,12 +94,26 @@ const SIPCalculator: React.FC = () => {
               label="Time Period"
               value={timePeriod}
               onChange={setTimePeriod}
-              min={1}
-              max={30}
-              step={1}
-              suffix="Years"
+              min={timeUnit === 'years' ? 1 : 1}
+              max={timeUnit === 'years' ? 30 : 360}
+              step={timeUnit === 'years' ? 1 : 1}
+              suffix={timeUnit === 'years' ? " Years" : " Months"}
               showSlider={true}
               placeholder="Enter investment duration"
+              timeUnitOptions={{
+                enabled: true,
+                currentUnit: timeUnit,
+                onUnitChange: (unit) => {
+                  if (unit === 'years' && timeUnit === 'months') {
+                    // Convert months to years (round to nearest 0.5)
+                    setTimePeriod(Math.round(timePeriod / 12 * 2) / 2);
+                  } else if (unit === 'months' && timeUnit === 'years') {
+                    // Convert years to months
+                    setTimePeriod(Math.round(timePeriod * 12));
+                  }
+                  setTimeUnit(unit);
+                }
+              }}
             />
             
             <div className="flex space-x-2 pt-2">

@@ -40,25 +40,31 @@ const EMICalculator: React.FC = () => {
     balance: number;
   }>>([]);
   
+  // Time unit state
+  const [timeUnit, setTimeUnit] = useState<'years' | 'months'>('years');
+  
   // Calculate results based on the active tab
   useEffect(() => {
     calculateResults();
-  }, [loanAmount, interestRate, loanTenure, emiAmount, activeTab]);
+  }, [loanAmount, interestRate, loanTenure, emiAmount, activeTab, timeUnit]);
   
   const calculateResults = () => {
     let result = 0;
     let totalInt = 0;
     let totalPay = 0;
     
+    // Convert tenure to years for calculations if needed
+    const tenureInYears = timeUnit === 'years' ? loanTenure : loanTenure / 12;
+    
     switch (activeTab) {
       case 'emi':
-        result = calculateEMI(loanAmount, interestRate, loanTenure);
+        result = calculateEMI(loanAmount, interestRate, tenureInYears);
         setEmiAmount(result);
-        totalInt = (result * loanTenure * 12) - loanAmount;
-        totalPay = result * loanTenure * 12;
+        totalInt = (result * tenureInYears * 12) - loanAmount;
+        totalPay = result * tenureInYears * 12;
         
         // Generate chart data
-        const chartData = generateEMIChartData(loanAmount, interestRate, loanTenure);
+        const chartData = generateEMIChartData(loanAmount, interestRate, tenureInYears);
         setChartData(
           chartData.labels.map((label, index) => ({
             name: label,
@@ -68,29 +74,38 @@ const EMICalculator: React.FC = () => {
         );
         
         // Generate payment schedule
-        const schedule = calculateAmortizationSchedule(loanAmount, interestRate, loanTenure);
+        const schedule = calculateAmortizationSchedule(loanAmount, interestRate, tenureInYears);
         setPaymentSchedule(schedule);
         break;
         
       case 'loan':
-        result = calculateLoanAmount(emiAmount, interestRate, loanTenure);
+        result = calculateLoanAmount(emiAmount, interestRate, tenureInYears);
         setLoanAmount(result);
-        totalInt = (emiAmount * loanTenure * 12) - result;
-        totalPay = emiAmount * loanTenure * 12;
+        totalInt = (emiAmount * tenureInYears * 12) - result;
+        totalPay = emiAmount * tenureInYears * 12;
         break;
         
       case 'interest':
-        result = calculateInterestRate(emiAmount, loanAmount, loanTenure);
+        result = calculateInterestRate(emiAmount, loanAmount, tenureInYears);
         setInterestRate(result);
-        totalInt = (emiAmount * loanTenure * 12) - loanAmount;
-        totalPay = emiAmount * loanTenure * 12;
+        totalInt = (emiAmount * tenureInYears * 12) - loanAmount;
+        totalPay = emiAmount * tenureInYears * 12;
         break;
         
       case 'tenure':
         result = calculateTimePeriod(emiAmount, loanAmount, interestRate);
+        
+        // Convert the result to the current time unit
+        if (timeUnit === 'months') {
+          result = result * 12;
+        }
+        
         setLoanTenure(result);
-        totalInt = (emiAmount * result * 12) - loanAmount;
-        totalPay = emiAmount * result * 12;
+        
+        // For total calculations, convert back to years
+        const calculationTenure = timeUnit === 'years' ? result : result / 12;
+        totalInt = (emiAmount * calculationTenure * 12) - loanAmount;
+        totalPay = emiAmount * calculationTenure * 12;
         break;
     }
     
@@ -101,7 +116,7 @@ const EMICalculator: React.FC = () => {
   const handleReset = () => {
     setLoanAmount(1000000);
     setInterestRate(8.5);
-    setLoanTenure(5);
+    setLoanTenure(timeUnit === 'years' ? 5 : 60);
     setEmiAmount(20000);
     setShowPaymentSchedule(false);
   };
@@ -137,15 +152,29 @@ const EMICalculator: React.FC = () => {
       
       <CalculatorInput
         id="loan-tenure"
-        label="Loan Tenure (Years)"
+        label="Loan Tenure"
         value={loanTenure}
         onChange={setLoanTenure}
-        min={1}
-        max={30}
-        step={1}
-        suffix="Years"
+        min={timeUnit === 'years' ? 1 : 1}
+        max={timeUnit === 'years' ? 30 : 360}
+        step={timeUnit === 'years' ? 1 : 1}
+        suffix={timeUnit === 'years' ? " Years" : " Months"}
         showSlider={true}
         placeholder="Enter loan tenure"
+        timeUnitOptions={{
+          enabled: true,
+          currentUnit: timeUnit,
+          onUnitChange: (unit) => {
+            if (unit === 'years' && timeUnit === 'months') {
+              // Convert months to years (round to nearest 0.5)
+              setLoanTenure(Math.round(loanTenure / 12 * 2) / 2);
+            } else if (unit === 'months' && timeUnit === 'years') {
+              // Convert years to months
+              setLoanTenure(Math.round(loanTenure * 12));
+            }
+            setTimeUnit(unit);
+          }
+        }}
       />
       
       <div className="flex space-x-2 pt-2">
@@ -193,15 +222,29 @@ const EMICalculator: React.FC = () => {
       
       <CalculatorInput
         id="loan-tenure-loan"
-        label="Loan Tenure (Years)"
+        label="Loan Tenure"
         value={loanTenure}
         onChange={setLoanTenure}
-        min={1}
-        max={30}
-        step={1}
-        suffix="Years"
+        min={timeUnit === 'years' ? 1 : 1}
+        max={timeUnit === 'years' ? 30 : 360}
+        step={timeUnit === 'years' ? 1 : 1}
+        suffix={timeUnit === 'years' ? " Years" : " Months"}
         showSlider={true}
         placeholder="Enter loan tenure"
+        timeUnitOptions={{
+          enabled: true,
+          currentUnit: timeUnit,
+          onUnitChange: (unit) => {
+            if (unit === 'years' && timeUnit === 'months') {
+              // Convert months to years (round to nearest 0.5)
+              setLoanTenure(Math.round(loanTenure / 12 * 2) / 2);
+            } else if (unit === 'months' && timeUnit === 'years') {
+              // Convert years to months
+              setLoanTenure(Math.round(loanTenure * 12));
+            }
+            setTimeUnit(unit);
+          }
+        }}
       />
       
       <div className="flex space-x-2 pt-2">
@@ -249,15 +292,29 @@ const EMICalculator: React.FC = () => {
       
       <CalculatorInput
         id="loan-tenure-interest"
-        label="Loan Tenure (Years)"
+        label="Loan Tenure"
         value={loanTenure}
         onChange={setLoanTenure}
-        min={1}
-        max={30}
-        step={1}
-        suffix="Years"
+        min={timeUnit === 'years' ? 1 : 1}
+        max={timeUnit === 'years' ? 30 : 360}
+        step={timeUnit === 'years' ? 1 : 1}
+        suffix={timeUnit === 'years' ? " Years" : " Months"}
         showSlider={true}
         placeholder="Enter loan tenure"
+        timeUnitOptions={{
+          enabled: true,
+          currentUnit: timeUnit,
+          onUnitChange: (unit) => {
+            if (unit === 'years' && timeUnit === 'months') {
+              // Convert months to years (round to nearest 0.5)
+              setLoanTenure(Math.round(loanTenure / 12 * 2) / 2);
+            } else if (unit === 'months' && timeUnit === 'years') {
+              // Convert years to months
+              setLoanTenure(Math.round(loanTenure * 12));
+            }
+            setTimeUnit(unit);
+          }
+        }}
       />
       
       <div className="flex space-x-2 pt-2">
@@ -348,9 +405,15 @@ const EMICalculator: React.FC = () => {
       case 'interest':
         return `${interestRate.toFixed(2)}%`;
       case 'tenure':
-        const years = Math.floor(loanTenure);
-        const months = Math.round((loanTenure - years) * 12);
-        return `${years} Years${months > 0 ? ` ${months} Months` : ''}`;
+        if (timeUnit === 'years') {
+          const years = Math.floor(loanTenure);
+          const months = Math.round((loanTenure - years) * 12);
+          return `${years} Years${months > 0 ? ` ${months} Months` : ''}`;
+        } else {
+          const years = Math.floor(loanTenure / 12);
+          const months = Math.round(loanTenure % 12);
+          return `${years > 0 ? `${years} Years ` : ''}${months} Months`;
+        }
     }
   };
   
