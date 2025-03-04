@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/layout/Header';
 import CalculatorLayout from '@/components/layout/CalculatorLayout';
@@ -40,7 +39,7 @@ const Index: React.FC = () => {
         activeCalculator={activeCalculator} 
         onChangeCalculator={setActiveCalculator} 
       />
-      <CalculatorLayout>
+      <CalculatorLayout calculatorType={activeCalculator}>
         <div className="animate-fade-in">
           {renderCalculator()}
         </div>
