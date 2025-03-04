@@ -163,7 +163,10 @@ const CreditScoreImpactCalculator: React.FC = () => {
       <div className="lg:col-span-2 space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Current Score Card */}
-          <CalculatorCard className="relative overflow-hidden">
+          <CalculatorCard 
+            title="Current Score"
+            className="relative overflow-hidden"
+          >
             <div className="absolute top-2 right-2">
               <Popover>
                 <PopoverTrigger>
@@ -182,7 +185,10 @@ const CreditScoreImpactCalculator: React.FC = () => {
           </CalculatorCard>
 
           {/* Projected Score Card */}
-          <CalculatorCard className="relative overflow-hidden">
+          <CalculatorCard 
+            title="Projected Score"
+            className="relative overflow-hidden"
+          >
             <div className="absolute top-2 right-2">
               <Popover>
                 <PopoverTrigger>
@@ -223,7 +229,10 @@ const CreditScoreImpactCalculator: React.FC = () => {
         </div>
         
         {/* Score Range Visualization */}
-        <CalculatorCard className="bg-white dark:bg-card">
+        <CalculatorCard 
+          title="Credit Score Range"
+          className="bg-white dark:bg-card"
+        >
           <h3 className="text-sm font-medium mb-4">Credit Score Range</h3>
           <div className="relative h-8 rounded-full bg-gradient-to-r from-red-500 via-yellow-400 to-green-500 mb-2">
             {/* Score indicators */}
@@ -257,7 +266,9 @@ const CreditScoreImpactCalculator: React.FC = () => {
         
         {/* Impact Factors Chart */}
         {sortedChartData.length > 0 && (
-          <CalculatorCard>
+          <CalculatorCard 
+            title="Score Impact Factors"
+          >
             <h3 className="text-sm font-medium mb-4">Score Impact Factors</h3>
             <div className="space-y-3">
               {sortedChartData.map((item) => (
