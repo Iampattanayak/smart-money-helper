@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Calculator, LineChart, BadgePercent, Landmark, Coins, Wallet, CreditCard, BarChart2 } from 'lucide-react';
+import { Calculator, LineChart, BadgePercent, Landmark, Coins, Wallet, BarChart2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface HeaderProps {
@@ -17,7 +16,6 @@ const Header: React.FC<HeaderProps> = ({ activeCalculator, onChangeCalculator })
     { id: 'fd', label: 'FD Calculator', icon: <Landmark className="w-4 h-4" /> },
     { id: 'rd', label: 'RD Calculator', icon: <Coins className="w-4 h-4" /> },
     { id: 'ppf', label: 'PPF Calculator', icon: <Wallet className="w-4 h-4" /> },
-    { id: 'credit-score', label: 'Credit Impact', icon: <CreditCard className="w-4 h-4" /> },
   ];
 
   return (

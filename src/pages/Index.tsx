@@ -8,7 +8,6 @@ import GSTCalculator from '@/components/calculators/GSTCalculator';
 import FDCalculator from '@/components/calculators/FDCalculator';
 import RDCalculator from '@/components/calculators/RDCalculator';
 import PPFCalculator from '@/components/calculators/PPFCalculator';
-import CreditScoreImpactCalculator from '@/components/calculators/CreditScoreImpactCalculator';
 import LoanComparisonCalculator from '@/components/calculators/LoanComparisonCalculator';
 
 const Index: React.FC = () => {
@@ -28,8 +27,6 @@ const Index: React.FC = () => {
         return <RDCalculator />;
       case 'ppf':
         return <PPFCalculator />;
-      case 'credit-score':
-        return <CreditScoreImpactCalculator />;
       case 'loan-comparison':
         return <LoanComparisonCalculator />;
       default:
