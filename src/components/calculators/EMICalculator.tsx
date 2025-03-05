@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -76,14 +77,14 @@ const EMICalculator: React.FC = () => {
         totalPay = result * tenureInYears * 12;
         
         // Generate chart data
-        const chartData = generateEMIChartData(loanAmount, interestRate, tenureInYears);
-        setChartData(
-          chartData.labels.map((label, index) => ({
-            name: label,
-            'Principal Paid': chartData.principal[index],
-            'Interest Paid': chartData.interest[index],
-          }))
-        );
+        const emiChartData = generateEMIChartData(loanAmount, interestRate, tenureInYears);
+        const formattedChartData = emiChartData.labels.map((label, index) => ({
+          name: label,
+          'Principal Paid': emiChartData.principal[index],
+          'Interest Paid': emiChartData.interest[index],
+        }));
+        
+        setChartData(formattedChartData);
         
         // Generate payment schedule
         const schedule = calculateAmortizationSchedule(loanAmount, interestRate, tenureInYears);
