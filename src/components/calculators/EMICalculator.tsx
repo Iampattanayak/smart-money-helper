@@ -76,15 +76,17 @@ const EMICalculator: React.FC = () => {
         totalInt = (result * tenureInYears * 12) - loanAmount;
         totalPay = result * tenureInYears * 12;
         
-        // Generate chart data
+        // Generate chart data - fixed to ensure proper data formatting
         const emiChartData = generateEMIChartData(loanAmount, interestRate, tenureInYears);
-        const formattedChartData = emiChartData.labels.map((label, index) => ({
-          name: label,
-          'Principal Paid': emiChartData.principal[index],
-          'Interest Paid': emiChartData.interest[index],
-        }));
-        
-        setChartData(formattedChartData);
+        if (emiChartData && emiChartData.labels && emiChartData.principal && emiChartData.interest) {
+          const formattedChartData = emiChartData.labels.map((label, index) => ({
+            name: label,
+            'Principal Paid': emiChartData.principal[index],
+            'Interest Paid': emiChartData.interest[index],
+          }));
+          
+          setChartData(formattedChartData);
+        }
         
         // Generate payment schedule
         const schedule = calculateAmortizationSchedule(loanAmount, interestRate, tenureInYears);
