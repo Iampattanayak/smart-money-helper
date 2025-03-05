@@ -16,7 +16,14 @@ import {
   calculateAmortizationSchedule,
 } from '@/utils/calculatorUtils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Pagination } from '@/components/ui/pagination';
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from '@/components/ui/pagination';
 
 const EMICalculator: React.FC = () => {
   // Common state for all calculators
@@ -483,21 +490,31 @@ const EMICalculator: React.FC = () => {
         {totalPages > 1 && (
           <div className="flex justify-center mt-4">
             <Pagination>
-              <Pagination.PrevButton
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-              />
-              
-              <div className="flex items-center px-4">
-                <span className="text-sm">
-                  Page {currentPage} of {totalPages}
-                </span>
-              </div>
-              
-              <Pagination.NextButton
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-              />
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    aria-disabled={currentPage === 1}
+                  />
+                </PaginationItem>
+                
+                <PaginationItem>
+                  <div className="flex items-center px-4">
+                    <span className="text-sm">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                  </div>
+                </PaginationItem>
+                
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    aria-disabled={currentPage === totalPages}
+                  />
+                </PaginationItem>
+              </PaginationContent>
             </Pagination>
           </div>
         )}
