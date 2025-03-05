@@ -16,6 +16,7 @@ import {
   calculateAmortizationSchedule,
 } from '@/utils/calculatorUtils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Pagination } from '@/components/ui/pagination';
 
 const EMICalculator: React.FC = () => {
   // Common state for all calculators
@@ -39,6 +40,10 @@ const EMICalculator: React.FC = () => {
     interest: number;
     balance: number;
   }>>([]);
+
+  // Pagination state for payment schedule
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
   
   // Time unit state
   const [timeUnit, setTimeUnit] = useState<'years' | 'months'>('years');
@@ -431,12 +436,12 @@ const EMICalculator: React.FC = () => {
     }
   };
   
-  // Payment Schedule Table Component
+  // Payment Schedule Table Component with pagination
   const PaymentSchedule = () => {
-    // Show only first 12 months and then every 12th month, plus the last month
-    const displayedSchedule = paymentSchedule.filter((item, index) => 
-      index < 12 || index === paymentSchedule.length - 1 || index % 12 === 0
-    );
+    const totalPages = Math.ceil(paymentSchedule.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, paymentSchedule.length);
+    const currentItems = paymentSchedule.slice(startIndex, endIndex);
     
     return (
       <div className="mt-6 animate-fade-in">
@@ -462,7 +467,7 @@ const EMICalculator: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {displayedSchedule.map((payment) => (
+              {currentItems.map((payment) => (
                 <TableRow key={payment.month}>
                   <TableCell>{payment.month}</TableCell>
                   <TableCell>{formatCurrency(payment.emi)}</TableCell>
@@ -474,8 +479,31 @@ const EMICalculator: React.FC = () => {
             </TableBody>
           </Table>
         </div>
+        
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-4">
+            <Pagination>
+              <Pagination.PrevButton
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+              />
+              
+              <div className="flex items-center px-4">
+                <span className="text-sm">
+                  Page {currentPage} of {totalPages}
+                </span>
+              </div>
+              
+              <Pagination.NextButton
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+              />
+            </Pagination>
+          </div>
+        )}
+        
         <p className="text-sm text-muted-foreground mt-2">
-          Showing first year monthly payments, then yearly, and final payment.
+          Showing monthly payment details {startIndex + 1}-{endIndex} of {paymentSchedule.length}
         </p>
       </div>
     );
@@ -541,7 +569,8 @@ const EMICalculator: React.FC = () => {
                   { name: 'Principal Paid', dataKey: 'Principal Paid', color: '#1E90FF' },
                   { name: 'Interest Paid', dataKey: 'Interest Paid', color: '#FF6347' }
                 ]}
-                type="bar"
+                type="both"
+                defaultTab="bar"
                 yAxisFormatter={(value) => `₹${Math.round(value / 1000)}K`}
                 tooltipFormatter={(value) => `₹${value.toLocaleString('en-IN')}`}
               />
