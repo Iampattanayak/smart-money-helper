@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -30,7 +29,6 @@ const PPFCalculator: React.FC = () => {
   
   const durationOptions = [15, 20, 25, 30];
   
-  // Calculate PPF results
   useEffect(() => {
     const calculateResults = () => {
       const ppfValue = calculatePPF(yearlyDeposit, interestRate, durationYears);
@@ -40,12 +38,10 @@ const PPFCalculator: React.FC = () => {
       setTotalDeposit(totalDepositAmount);
       setInterestEarned(ppfValue - totalDepositAmount);
       
-      // Calculate maturity date
       const newMaturityDate = new Date(investmentDate);
       newMaturityDate.setFullYear(newMaturityDate.getFullYear() + durationYears);
       setMaturityDate(newMaturityDate);
       
-      // Generate chart data
       const chartData = generatePPFChartData(yearlyDeposit, interestRate, durationYears);
       setChartData(
         chartData.labels.map((label, index) => ({
@@ -187,7 +183,7 @@ const PPFCalculator: React.FC = () => {
               { name: 'Deposits', dataKey: 'Deposits', color: '#1E90FF', stackId: 'a' },
               { name: 'Interest', dataKey: 'Interest', color: '#4CAF50', stackId: 'a' }
             ]}
-            type="area"
+            type="bar"
             yAxisFormatter={(value) => `₹${Math.round(value / 1000)}K`}
             tooltipFormatter={(value) => `₹${value.toLocaleString('en-IN')}`}
           />

@@ -541,7 +541,7 @@ const EMICalculator: React.FC = () => {
                   { name: 'Principal Paid', dataKey: 'Principal Paid', color: '#1E90FF' },
                   { name: 'Interest Paid', dataKey: 'Interest Paid', color: '#FF6347' }
                 ]}
-                type="area"
+                type="bar"
                 yAxisFormatter={(value) => `₹${Math.round(value / 1000)}K`}
                 tooltipFormatter={(value) => `₹${value.toLocaleString('en-IN')}`}
               />
