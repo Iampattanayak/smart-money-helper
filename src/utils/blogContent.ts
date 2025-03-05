@@ -146,7 +146,7 @@ export const getBlogContent = (calculatorType: string): BlogContent => {
           },
           {
             heading: 'The Power of Regular Financial Assessment',
-            content: 'Regularly using financial calculators helps you stay on track with your financial goals. Whether you're planning for a major purchase, saving for retirement, or managing debt, our tools provide the insights needed for successful financial planning.'
+            content: 'Regularly using financial calculators helps you stay on track with your financial goals. Whether you\'re planning for a major purchase, saving for retirement, or managing debt, our tools provide the insights needed for successful financial planning.'
           },
           {
             heading: 'Customized Calculations for Your Needs',
