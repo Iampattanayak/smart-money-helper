@@ -129,7 +129,7 @@ const FDCalculator: React.FC = () => {
                 value={timePeriod}
                 onChange={setTimePeriod}
                 min={timeUnit === 'years' ? 1 : 1}
-                max={timeUnit === 'years' ? 30 : 120}
+                max={timeUnit === 'years' ? 60 : 720}
                 step={timeUnit === 'years' ? 1 : 1}
                 suffix={timeUnit === 'years' ? ' Years' : ' Months'}
                 showSlider={true}
